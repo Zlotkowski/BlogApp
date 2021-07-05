@@ -1,0 +1,19 @@
+.pages {
+  width: 800px;
+  background-color: antiquewhite;
+  margin: 50px auto;
+}
+
+.page-header {
+  padding: 10px;
+  background-color: aqua;
+}
+
+.page-content {
+  padding: 10px;
+  background-color: aquamarine;
+}
+
+.active {
+  font-weight: bold;
+}
