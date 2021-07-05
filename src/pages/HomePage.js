@@ -9,6 +9,17 @@ const reducer = (state, action) => {
       return { ...state, loading: false, posts: action.payload, error: "" };
     case "POSTS_FAIL":
       return { ...state, error: action.payload, loading: false };
+    case "USERS_REQUEST":
+      return { ...state, loadingUsers: true };
+    case "USERS_SUCCESS":
+      return {
+        ...state,
+        loadingUsers: false,
+        users: action.payload,
+        errorUsers: "",
+      };
+    case "USERS_FAIL":
+      return { ...state, errorUsers: action.payload, loadingUsers: false };
     default:
       return state;
   }
@@ -19,9 +30,12 @@ export default function HomePage() {
     loading: false,
     error: "",
     posts: [],
+    loadingUsers: false,
+    errorUsers: "",
+    users: [],
   });
 
-  const { loading, error, posts } = state;
+  const { loading, error, posts, loadingUsers, errorUsers, users } = state;
 
   const loadPosts = async () => {
     dispatch({ type: "POSTS_REQUEST" });
@@ -35,8 +49,21 @@ export default function HomePage() {
     }
   };
 
+  const loadUsers = async () => {
+    dispatch({ type: "USERS_REQUEST" });
+    try {
+      const { data } = await axios.get(
+        "https://jsonplaceholder.typicode.com/users"
+      );
+      dispatch({ type: "USERS_SUCCESS", payload: data });
+    } catch (error) {
+      dispatch({ type: "USERS_FAIL", payload: error.message });
+    }
+  };
+
   useEffect(() => {
     loadPosts();
+    loadUsers();
   }, []);
 
   return (
@@ -56,6 +83,22 @@ export default function HomePage() {
                 <h2>{post.title}</h2>
                 <p>{post.body}</p>
               </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <div className="sidebar">
+        <h2>Authors</h2>
+        {loadingUsers ? (
+          <div>Loading...</div>
+        ) : errorUsers ? (
+          <div>Error: {errorUsers}</div>
+        ) : users.length === 0 ? (
+          <div>No user found</div>
+        ) : (
+          <ul>
+            {users.map((user) => (
+              <li key={user.id}> {user.name}</li>
             ))}
           </ul>
         )}
