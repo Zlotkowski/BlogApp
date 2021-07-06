@@ -52,9 +52,7 @@ export default function HomePage() {
     dispatch({ type: "POSTS_REQUEST" });
     try {
       const { data } = await axios.get(
-        userId
-          ? "https://jsonplaceholder.typicode.com/posts?userId=" + userId
-          : "https://jsonplaceholder.typicode.com/posts"
+        userId ? "/api/posts?userId=" + userId : "/api/posts"
       );
       const filteredPosts = query
         ? data.filter(
@@ -103,6 +101,8 @@ export default function HomePage() {
           <div>Loading...</div>
         ) : error ? (
           <div>Error: {error}</div>
+        ) : posts.length === 0 ? (
+          <div>Take it easy it's just no posts found :)</div>
         ) : (
           <ul>
             {posts.map((post) => (
