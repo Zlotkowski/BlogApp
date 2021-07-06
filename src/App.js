@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import { ThemeContext } from "./ThemeContext";
 import HomePage from "./pages/HomePage";
 import PostPage from "./pages/PostPage";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   const { theme } = useContext(ThemeContext);
@@ -14,6 +15,9 @@ function App() {
         <Navbar />
         <div className="main">
           <Switch>
+            <Route path="/login">
+              <LoginPage />
+            </Route>
             <Route path="/post/:postId">
               <PostPage />
             </Route>

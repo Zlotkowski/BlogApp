@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { ThemeContext } from "../ThemeContext";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, NavLink } from "react-router-dom";
 
 export default function Navbar() {
   const [query, setQuery] = useState("initialState");
@@ -18,7 +18,7 @@ export default function Navbar() {
           <strong>Awesome Blog</strong>
         </Link>
       </div>
-      <div class="header-item">
+      <div className="header-item">
         <form onSubmit={handleSubmit}>
           <input
             name="query"
@@ -30,7 +30,7 @@ export default function Navbar() {
         </form>
       </div>
       <div className="header-item">
-        <a href="/login">Login</a>
+        <NavLink to="/login">Login</NavLink>
         <button onClick={toggleTheme}>
           {theme === "light" ? "Theme: Normal" : "Theme: Dark"}
         </button>
