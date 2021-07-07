@@ -1,6 +1,7 @@
 import axios from "axios";
-import React, { useEffect, useReducer } from "react";
+import React, { useContext, useEffect, useReducer } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ThemeContext } from "../ThemeContext";
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -34,6 +35,7 @@ const reducer = (state, action) => {
 };
 
 export default function HomePage() {
+  const { backendAPI } = useContext(ThemeContext);
   const { query, userId } = useParams();
   const [state, dispatch] = useReducer(reducer, {
     loading: false,
@@ -52,7 +54,7 @@ export default function HomePage() {
     dispatch({ type: "POSTS_REQUEST" });
     try {
       const { data } = await axios.get(
-        userId ? "/api/posts?userId=" + userId : "/api/posts"
+        userId ? `${backendAPI}/posts?userId=${userId}` : `${backendAPI}/posts`
       );
       const filteredPosts = query
         ? data.filter(
@@ -71,7 +73,7 @@ export default function HomePage() {
     dispatch({ type: "USERS_REQUEST" });
     try {
       const { data } = await axios.get(
-        userId ? "/api/users/" + userId : "/api/users/"
+        userId ? `${backendAPI}/users/${userId}` : `${backendAPI}/users`
       );
       dispatch({
         type: userId ? "USER_SUCCESS" : "USERS_SUCCESS",
@@ -85,7 +87,7 @@ export default function HomePage() {
   useEffect(() => {
     loadPosts();
     loadUsers();
-  }, [query, userId]);
+  }, [query, userId, backendAPI]);
 
   return (
     <div className="blog">

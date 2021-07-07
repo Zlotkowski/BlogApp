@@ -1,6 +1,7 @@
 import axios from "axios";
-import React, { useEffect, useReducer } from "react";
+import React, { useContext, useEffect, useReducer } from "react";
 import { useParams, Link } from "react-router-dom";
+import { ThemeContext } from "../ThemeContext";
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -16,6 +17,7 @@ const reducer = (state, action) => {
 };
 
 export default function PostPage() {
+  const { backendAPI } = useContext(ThemeContext);
   const { postId } = useParams();
 
   const [state, dispatch] = useReducer(reducer, {
@@ -29,8 +31,10 @@ export default function PostPage() {
   const fetchPost = async () => {
     dispatch({ type: "POST_REQUEST" });
     try {
-      const { data } = await axios.get(`/api/posts/${postId}`);
-      const { data: userData } = await axios.get(`/api/users/${data.userId}`);
+      const { data } = await axios.get(`${backendAPI}/posts/${postId}`);
+      const { data: userData } = await axios.get(
+        `${backendAPI}/users/${data.userId}`
+      );
       dispatch({ type: "POST_SUCCESS", payload: { ...data, user: userData } });
     } catch (error) {
       dispatch({ type: "POST_FAIL", payload: error.message });
@@ -39,7 +43,7 @@ export default function PostPage() {
 
   useEffect(() => {
     fetchPost();
-  }, []);
+  }, [backendAPI]);
 
   return (
     <div>

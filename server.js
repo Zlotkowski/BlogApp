@@ -24,6 +24,7 @@ const User = mongoose.model(
     id: Number,
     name: String,
     email: String,
+    password: String,
     phone: String,
     website: String,
   })

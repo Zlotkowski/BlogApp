@@ -22,7 +22,7 @@ const reducer = (state, action) => {
 };
 
 export default function LoginPage() {
-  const { user, setUser } = useContext(ThemeContext);
+  const { user, setUser, backendAPI } = useContext(ThemeContext);
   const history = useHistory();
 
   if (user) {
@@ -45,7 +45,7 @@ export default function LoginPage() {
     dispatch({ type: "LOGIN_REQUEST" });
     try {
       const { data } = await axios(
-        `https://jsonplaceholder.typicode.com/users?email=${email}&password=${password}`
+        `${backendAPI}/users?email=${email}&password=${password}`
       );
       if (data.length > 0) {
         dispatch({ type: "LOGIN_SUCCESS", payload: data[0] });
@@ -62,7 +62,7 @@ export default function LoginPage() {
       setUser(loggedInUser);
       return history.push("/profile");
     }
-  }, [loggedInUser]);
+  }, [loggedInUser, backendAPI]);
 
   return (
     <div>
