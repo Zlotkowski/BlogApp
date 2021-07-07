@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import path from "path";
 
 dotenv.config();
 const app = express();
@@ -8,7 +9,7 @@ app.use(express.json());
 
 mongoose
   .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
+    useNewUsrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
   })
@@ -17,7 +18,6 @@ mongoose
   })
   .catch(() => console.log("error in connecting to db"));
 
-//USERS
 const User = mongoose.model(
   "users",
   new mongoose.Schema({
@@ -35,7 +35,6 @@ app.get("/api/users", async (req, res) => {
   const users = await User.find(email && password ? { email, password } : {});
   res.send(users);
 });
-
 app.get("/api/users/:id", async (req, res) => {
   const { id } = req.params;
   const user = await User.findOne({ id });
@@ -48,19 +47,17 @@ app.get("/api/users/:id", async (req, res) => {
 
 app.post("/api/users", async (req, res) => {
   if (!req.body.name || !req.body.email || !req.body.password) {
-    return res.send({ message: "Data is required" });
-  } else {
-    const user = new User(req.body);
-    const createdUser = await user.save();
-    res.send(createdUser);
+    return res.send({ message: "Data is required." });
   }
+  const user = new User(req.body);
+  const createdUser = await user.save();
+  res.send(createdUser);
 });
 
-//UPDATE USER
 app.put("/api/users/:id", async (req, res) => {
   const { id } = req.params;
   const { email, name, phone, password, website } = req.body;
-  const user = await User.findOne(id);
+  const user = await User.findOne({ id });
   if (user) {
     user.email = email;
     user.name = name;
@@ -74,7 +71,7 @@ app.put("/api/users/:id", async (req, res) => {
   }
 });
 
-//POST
+// POST
 const Post = mongoose.model(
   "posts",
   new mongoose.Schema(
@@ -95,7 +92,6 @@ app.get("/api/posts", async (req, res) => {
   const posts = await Post.find(userId ? { userId } : {});
   res.send(posts);
 });
-
 app.get("/api/posts/:id", async (req, res) => {
   const { id } = req.params;
   const post = await Post.findOne({ id });
@@ -108,12 +104,11 @@ app.get("/api/posts/:id", async (req, res) => {
 
 app.post("/api/posts", async (req, res) => {
   if (!req.body.title || !req.body.body) {
-    return res.send({ message: "Data is required" });
-  } else {
-    const post = new Post(req.body);
-    const createdPost = await post.save();
-    res.send(createdPost);
+    return res.send({ message: "Data is required." });
   }
+  const post = new Post(req.body);
+  const createdPost = await post.save();
+  res.send(createdPost);
 });
 
 app.get("/api/seed", async (req, res) => {
@@ -132,13 +127,17 @@ app.get("/api/seed", async (req, res) => {
   await Post.insertMany([
     {
       id: 1,
-      title: "Hello world",
-      body: "Welcome to my world",
+      title: "Welcome in my world",
+      body: "It's probably working",
       userId: 1,
     },
   ]);
   res.send({ message: "seeded successfully" });
 });
 
+const dirname = path.resolve();
+app.use("/", express.static(dirname + "/build"));
+app.get("/", (req, res) => res.sendFile(dirname + "/build/index.html"));
+
 const port = process.env.PORT || 5000;
-app.listen(port, () => console.log("served at http://localhost:5000"));
+app.listen(port, () => console.log(`served at http://localhost:5000`));

@@ -5,23 +5,23 @@ import { ThemeContext } from "../ThemeContext";
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case "LOGIN_REQUEST":
+    case "REGISTER_REQUEST":
       return { ...state, loading: true };
-    case "LOGIN_SUCCESS":
+    case "REGISTER_SUCCESS":
       return {
         ...state,
         loading: false,
         error: "",
         loggedInUser: action.payload,
       };
-    case "LOGIN_FAIL":
+    case "REGISTER_FAIL":
       return { ...state, loading: false, error: action.payload };
     default:
       return state;
   }
 };
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const { user, setUser, backendAPI } = useContext(ThemeContext);
   const history = useHistory();
   if (user) {
@@ -33,24 +33,25 @@ export default function LoginPage() {
     loggedInUser: null,
   });
   const { loading, error, loggedInUser } = state;
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch({ type: "LOGIN_REQUEST" });
+    dispatch({ type: "REGISTER_REQUEST" });
     try {
-      const { data } = await axios(
-        `${backendAPI}/users?email=${email}&password=${password}`
-      );
-      if (data.length > 0) {
-        localStorage.setItem("user", JSON.stringify(data[0]));
-        dispatch({ type: "LOGIN_SUCCESS", payload: data[0] });
-      } else {
-        dispatch({ type: "LOGIN_FAIL", payload: "Invalid email or password" });
-      }
+      const { data } = await axios.post(`${backendAPI}/users`, {
+        name,
+        email,
+        password,
+        id: Math.floor(Math.random() * 1000000),
+      });
+
+      localStorage.setItem("user", JSON.stringify(data));
+      dispatch({ type: "REGISTER_SUCCESS", payload: data });
     } catch (err) {
-      dispatch({ type: "LOGIN_FAIL", payload: err.message });
+      dispatch({ type: "REGISTER_FAIL", payload: err.message });
     }
   };
   useEffect(() => {
@@ -61,8 +62,18 @@ export default function LoginPage() {
   }, [loggedInUser, backendAPI]);
   return (
     <div>
-      <h1>Login User</h1>
+      <h1>Register User</h1>
       <form onSubmit={handleSubmit} className="form">
+        <div className="form-item">
+          <label htmlFor="name">Name:</label>
+          <input
+            name="name"
+            id="name"
+            type="text"
+            required
+            onChange={(e) => setName(e.target.value)}
+          ></input>
+        </div>
         <div className="form-item">
           <label htmlFor="email">Email:</label>
           <input
@@ -85,7 +96,7 @@ export default function LoginPage() {
         </div>
         <div className="form-item">
           <label></label>
-          <button>Login</button>
+          <button>Register</button>
         </div>
         {loading && (
           <div className="form-item">
@@ -102,12 +113,8 @@ export default function LoginPage() {
         <div className="form-item">
           <label></label>
           <span>
-            New user? <Link to="/register">Register</Link>
+            Already have an account? <Link to="/login">Login</Link>
           </span>
-        </div>
-        <div className="form-item">
-          <label></label>
-          <span>Or use email: Sincere@april.biz password: 123 </span>
         </div>
       </form>
     </div>
